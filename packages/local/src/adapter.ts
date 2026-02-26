@@ -24,21 +24,28 @@ function createId(prefix: string): string {
 export function createLocalStorageAdapter(config: LocalStorageAdapterConfig = {}): Adapter {
   const storageKey = config.storageKey ?? DEFAULT_STORAGE_KEY
   const author = config.author ?? { name: 'Local Reviewer', avatarUrl: '' }
+  let inMemoryState: PersistedState = { threads: [] }
 
   function loadState(): PersistedState {
     try {
       const raw = localStorage.getItem(storageKey)
-      if (!raw) return { threads: [] }
+      if (!raw) return inMemoryState
       const parsed = JSON.parse(raw) as PersistedState
-      if (!Array.isArray(parsed.threads)) return { threads: [] }
+      if (!Array.isArray(parsed.threads)) return inMemoryState
+      inMemoryState = parsed
       return parsed
     } catch {
-      return { threads: [] }
+      return inMemoryState
     }
   }
 
   function saveState(state: PersistedState): void {
-    localStorage.setItem(storageKey, JSON.stringify(state))
+    inMemoryState = state
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state))
+    } catch {
+      // localStorage can be unavailable in private mode or restricted contexts.
+    }
   }
 
   function withState<T>(updater: (threads: Thread[]) => T): T {

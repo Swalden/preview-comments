@@ -27,11 +27,11 @@ export const baseStyles = `
     z-index: 999999;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     background: rgba(17, 19, 25, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
-    padding: 10px 14px;
+    padding: 10px 12px;
     backdrop-filter: blur(8px);
     box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
   }
@@ -40,12 +40,6 @@ export const baseStyles = `
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  .pc-toolbar-divider {
-    width: 1px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.18);
   }
 
   .pc-toolbar-btn {
@@ -67,22 +61,6 @@ export const baseStyles = `
   .pc-toolbar-btn:active { transform: scale(0.98); }
   .pc-toolbar-btn:hover { background: var(--pc-accent-hover); }
   .pc-toolbar-btn.active { background: var(--pc-accent-hover); outline: 2px solid rgba(255,255,255,0.35); }
-
-  .pc-toolbar-icon {
-    border: none;
-    background: transparent;
-    color: #d7d9e0;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0.9;
-    transition: opacity 0.12s;
-  }
-
-  .pc-toolbar-icon:hover { opacity: 1; }
 
   .pc-people {
     display: none;
@@ -187,6 +165,12 @@ export const baseStyles = `
     padding: 10px 12px;
     display: flex;
     gap: 8px;
+  }
+
+  .pc-inline-status {
+    padding: 0 12px 10px;
+    font-size: 12px;
+    color: #fda4af;
   }
 
   .pc-input {

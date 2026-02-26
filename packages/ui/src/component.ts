@@ -190,6 +190,10 @@ export class PreviewCommentsElement extends HTMLElement {
     input.placeholder = 'Leave a comment...'
     input.rows = 2
 
+    const status = document.createElement('div')
+    status.className = 'pc-inline-status'
+    status.style.display = 'none'
+
     const submit = document.createElement('button')
     submit.className = 'pc-btn'
     submit.textContent = 'Post'
@@ -201,6 +205,8 @@ export class PreviewCommentsElement extends HTMLElement {
 
       submit.disabled = true
       submit.textContent = '...'
+      status.style.display = 'none'
+      status.textContent = ''
 
       try {
         const thread = await this.adapter.createThread(anchor, body)
@@ -210,14 +216,18 @@ export class PreviewCommentsElement extends HTMLElement {
           activeThreadId: null,
         })
         this.popoverContainer.innerHTML = ''
-      } catch {
-        submit.textContent = 'Error'
+      } catch (error) {
+        submit.disabled = false
+        submit.textContent = 'Post'
+        status.textContent = error instanceof Error ? error.message : 'Failed to create comment.'
+        status.style.display = 'block'
       }
     })
 
     inputArea.appendChild(input)
     inputArea.appendChild(submit)
     popover.appendChild(inputArea)
+    popover.appendChild(status)
     this.popoverContainer.appendChild(popover)
     input.focus()
   }

@@ -21,37 +21,30 @@
 
   <div class="card" data-testid="settings-card">
     <h2>Settings Card</h2>
-    <p>Comments are stored as GitHub PR comments.</p>
+    <p>Comments are stored in localStorage for local testing.</p>
   </div>
 
   <script type="importmap">
     {
       "imports": {
-        "@preview-comments/core": "../../packages/core/dist/index.js"
+        "@preview-comments/core": "../../packages/core/dist/index.js",
+        "@preview-comments/local": "../../packages/local/dist/index.js"
       }
     }
   </script>
 
   <script type="module">
     import { mount } from '../../packages/ui/dist/index.js'
-    import { createGitHubAdapter } from '../../packages/github/dist/index.js'
+    import { createLocalStorageAdapter } from '@preview-comments/local'
 
-    // Replace with your values
-    const REPO = 'your-org/your-repo'
-    const PR_NUMBER = 1
-    const GITHUB_CLIENT_ID = 'your-client-id'
-    const CALLBACK_URL = `${window.location.origin}/examples/vanilla/callback.html`
-
-    const adapter = createGitHubAdapter({
-      repo: REPO,
-      pr: PR_NUMBER,
-      getToken: () => localStorage.getItem('preview-comments:github-token'),
+    const adapter = createLocalStorageAdapter({
+      storageKey: 'preview-comments:local-demo',
+      author: { name: 'Local Tester', avatarUrl: '' },
     })
 
     mount({
       adapter,
-      githubClientId: GITHUB_CLIENT_ID,
-      githubCallbackUrl: CALLBACK_URL,
+      initialUser: { name: 'Local Tester', avatarUrl: '', token: 'local' },
     })
   </script>
 </body>

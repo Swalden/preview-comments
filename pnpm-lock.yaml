@@ -29,6 +29,12 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/local:
+    dependencies:
+      '@preview-comments/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/ui:
     dependencies:
       '@preview-comments/core':

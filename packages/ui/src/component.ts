@@ -249,7 +249,7 @@ export class PreviewCommentsElement extends HTMLElement {
         pin.className = `pc-pin${thread.resolved ? ' resolved' : ''}`
         pin.style.left = `${position.x}px`
         pin.style.top = `${position.y}px`
-        pin.innerHTML = `<span>${index + 1}</span>`
+        pin.innerHTML = `<span>${this.getThreadInitials(thread)}</span>`
 
         pin.addEventListener('click', (event) => {
           event.stopPropagation()
@@ -265,6 +265,20 @@ export class PreviewCommentsElement extends HTMLElement {
 
         this.pinsContainer.appendChild(pin)
       })
+  }
+
+  private getThreadInitials(thread: Thread): string {
+    const name = thread.comments[0]?.author.name?.trim()
+    if (!name) {
+      return '?'
+    }
+
+    const parts = name.split(/\s+/).filter(Boolean)
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase()
+    }
+
+    return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
   }
 
   private showThreadPopover(thread: Thread, x: number, y: number): void {

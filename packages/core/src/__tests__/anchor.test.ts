@@ -58,4 +58,14 @@ describe('resolveAnchor', () => {
     expect(pos).not.toBeNull()
     expect(pos!.strategy).toBe('page')
   })
+
+  it('falls back to page position when selector is empty', () => {
+    const pos = resolveAnchor({
+      selector: '', offsetXPercent: 0.5, offsetYPercent: 0.5,
+      pageXPercent: 0.3, pageYPercent: 0.4, pathname: '/products',
+      viewport: { width: 1000, height: 800 },
+    })
+    expect(pos).not.toBeNull()
+    expect(pos!.strategy).toBe('page')
+  })
 })

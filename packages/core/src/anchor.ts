@@ -21,7 +21,12 @@ export function createAnchor(element: Element, clientX: number, clientY: number,
 }
 
 export function resolveAnchor(anchor: PinAnchor): ResolvedPosition | null {
-  const el = document.querySelector(anchor.selector)
+  let el: Element | null = null
+  try {
+    el = anchor.selector ? document.querySelector(anchor.selector) : null
+  } catch {
+    el = null
+  }
   if (el) {
     const rect = el.getBoundingClientRect()
     return {

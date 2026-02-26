@@ -1,4 +1,7 @@
 export function generateSelector(el: Element): string {
+  if (el === document.documentElement) return 'html'
+  if (el === document.body) return 'body'
+
   const testId = el.getAttribute('data-testid')
   if (testId) return `[data-testid="${testId}"]`
   if (el.id) return `#${el.id}`
@@ -30,5 +33,6 @@ export function generateSelector(el: Element): string {
     }
     current = parent
   }
-  return path.join(' > ')
+  const selector = path.join(' > ')
+  return selector.length > 0 ? selector : 'body'
 }

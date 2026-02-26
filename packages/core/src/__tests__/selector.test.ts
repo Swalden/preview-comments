@@ -33,4 +33,9 @@ describe('generateSelector', () => {
     const selector = generateSelector(document.body)
     expect(selector).toBe('body')
   })
+
+  it('handles html as root', () => {
+    const selector = generateSelector(document.documentElement)
+    expect(selector).toBe('html')
+  })
 })

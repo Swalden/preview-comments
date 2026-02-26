@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Comments - Vanilla Example</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1 { margin-bottom: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Preview Comments Demo</h1>
+  <p>Click the comment button in the bottom-right to start leaving feedback.</p>
+
+  <div class="card" data-testid="feature-card">
+    <h2>Feature Card</h2>
+    <p>Try clicking anywhere on this card to leave a comment pin.</p>
+  </div>
+
+  <div class="card" data-testid="settings-card">
+    <h2>Settings Card</h2>
+    <p>Comments are stored as GitHub PR comments.</p>
+  </div>
+
+  <script type="module">
+    import { mount } from '../../packages/ui/dist/index.js'
+    import { createGitHubAdapter } from '../../packages/github/dist/index.js'
+
+    // Replace with your values
+    const REPO = 'your-org/your-repo'
+    const PR_NUMBER = 1
+    const GITHUB_CLIENT_ID = 'your-client-id'
+    const CALLBACK_URL = `${window.location.origin}/examples/vanilla/callback.html`
+
+    const adapter = createGitHubAdapter({
+      repo: REPO,
+      pr: PR_NUMBER,
+      getToken: () => localStorage.getItem('preview-comments:github-token'),
+    })
+
+    mount({
+      adapter,
+      githubClientId: GITHUB_CLIENT_ID,
+      githubCallbackUrl: CALLBACK_URL,
+    })
+  </script>
+</body>
+</html>

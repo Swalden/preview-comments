@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Authenticating...</title>
+</head>
+<body>
+  <p>Authenticating with GitHub...</p>
+  <script>
+    // In production, this page should call your backend to exchange code for token.
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+
+    if (code) {
+      document.body.innerHTML = '<p>Got authorization code. Your backend should exchange this for a token.</p>'
+    } else {
+      window.opener?.postMessage({ type: 'preview-comments:error', message: 'No code received' }, '*')
+      window.close()
+    }
+  </script>
+</body>
+</html>

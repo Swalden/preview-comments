@@ -1,13 +1,14 @@
 export const baseStyles = `
   :host {
-    --pc-accent: #0070f3;
-    --pc-accent-hover: #005bb5;
-    --pc-bg: #ffffff;
-    --pc-text: #111111;
-    --pc-text-muted: #666666;
-    --pc-border: #e2e2e2;
-    --pc-radius: 8px;
-    --pc-font: system-ui, -apple-system, sans-serif;
+    --pc-accent: #4f6ff7;
+    --pc-accent-hover: #3f5be6;
+    --pc-bg: #0f1014;
+    --pc-bg-soft: #1a1c23;
+    --pc-text: #f3f4f8;
+    --pc-text-muted: #b9bdc9;
+    --pc-border: #2a2d38;
+    --pc-radius: 12px;
+    --pc-font: "Inter", "SF Pro Text", "Segoe UI", sans-serif;
     --pc-pin-size: 28px;
 
     font-family: var(--pc-font);
@@ -20,12 +21,31 @@ export const baseStyles = `
 
   .pc-toolbar {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 999999;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    background: rgba(17, 19, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    padding: 10px 14px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  }
+
+  .pc-toolbar-segment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pc-toolbar-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.18);
   }
 
   .pc-toolbar-btn {
@@ -39,18 +59,58 @@ export const baseStyles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: background 0.15s;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 4px 10px rgba(0,0,0,0.32);
+    transition: background 0.15s, transform 0.12s;
     position: relative;
   }
 
+  .pc-toolbar-btn:active { transform: scale(0.98); }
   .pc-toolbar-btn:hover { background: var(--pc-accent-hover); }
-  .pc-toolbar-btn.active { background: var(--pc-accent-hover); outline: 2px solid white; }
+  .pc-toolbar-btn.active { background: var(--pc-accent-hover); outline: 2px solid rgba(255,255,255,0.35); }
+
+  .pc-toolbar-icon {
+    border: none;
+    background: transparent;
+    color: #d7d9e0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: opacity 0.12s;
+  }
+
+  .pc-toolbar-icon:hover { opacity: 1; }
+
+  .pc-people {
+    display: none;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  .pc-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0f1014;
+    background: linear-gradient(135deg, #f7c948, #f59e0b);
+    border: 2px solid #1a1c23;
+    margin-left: -7px;
+  }
+
+  .pc-avatar:first-child { margin-left: 0; }
 
   .pc-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: -2px;
+    right: -2px;
     background: #ef4444;
     color: white;
     border-radius: 50%;
@@ -89,11 +149,11 @@ export const baseStyles = `
 
   .pc-popover {
     position: fixed;
-    width: 300px;
+    width: min(360px, calc(100vw - 20px));
     background: var(--pc-bg);
     border: 1px solid var(--pc-border);
     border-radius: var(--pc-radius);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
     z-index: 999999;
     overflow: hidden;
   }
@@ -132,6 +192,8 @@ export const baseStyles = `
   .pc-input {
     flex: 1;
     border: 1px solid var(--pc-border);
+    background: var(--pc-bg-soft);
+    color: var(--pc-text);
     border-radius: 6px;
     padding: 6px 10px;
     font-size: 13px;
@@ -141,6 +203,7 @@ export const baseStyles = `
   }
 
   .pc-input:focus { border-color: var(--pc-accent); }
+  .pc-input::placeholder { color: var(--pc-text-muted); }
 
   .pc-btn {
     padding: 6px 12px;
@@ -175,5 +238,15 @@ export const baseStyles = `
     margin-bottom: 12px;
     color: var(--pc-text-muted);
     font-size: 13px;
+  }
+
+  @media (max-width: 720px) {
+    .pc-toolbar {
+      left: 50%;
+      bottom: 12px;
+      width: calc(100vw - 20px);
+      max-width: 520px;
+      justify-content: center;
+    }
   }
 `

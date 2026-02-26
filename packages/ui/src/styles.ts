@@ -103,27 +103,50 @@ export const baseStyles = `
 
   .pc-pin {
     position: fixed;
-    width: var(--pc-pin-size);
-    height: var(--pc-pin-size);
-    border-radius: 50% 50% 50% 0;
-    background: var(--pc-accent);
-    color: white;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
     cursor: pointer;
-    transform: rotate(-45deg) translate(-50%, -50%);
-    transform-origin: top left;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transform: translate(-50%, -50%);
+    transform-origin: center;
     z-index: 999998;
-    transition: transform 0.1s;
+    transition: transform 0.12s;
   }
 
-  .pc-pin span { transform: rotate(45deg); }
-  .pc-pin:hover { transform: rotate(-45deg) translate(-50%, -50%) scale(1.15); }
-  .pc-pin.resolved { background: #9ca3af; }
+  .pc-pin:hover { transform: translate(-50%, -50%) scale(1.08); }
+  .pc-pin.resolved { opacity: 0.78; filter: grayscale(0.2); }
+
+  .pc-pin-stack {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .pc-pin-mini,
+  .pc-pin-overflow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    border: 2px solid #eef2ff;
+    margin-left: -9px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    letter-spacing: 0.02em;
+  }
+
+  .pc-pin-mini:first-child,
+  .pc-pin-overflow:first-child {
+    margin-left: 0;
+  }
+
+  .pc-pin-overflow {
+    background: #5d6678;
+    color: #f8fafc;
+  }
 
   .pc-popover {
     position: fixed;

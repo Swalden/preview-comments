@@ -239,7 +239,7 @@ export class PreviewCommentsElement extends HTMLElement {
 
     threads
       .filter((thread) => thread.anchor.pathname === currentPath)
-      .forEach((thread, index) => {
+      .forEach((thread) => {
         const position = resolveAnchor(thread.anchor)
         if (!position) {
           return
@@ -249,7 +249,7 @@ export class PreviewCommentsElement extends HTMLElement {
         pin.className = `pc-pin${thread.resolved ? ' resolved' : ''}`
         pin.style.left = `${position.x}px`
         pin.style.top = `${position.y}px`
-        pin.innerHTML = `<span>${this.getThreadInitials(thread)}</span>`
+        pin.appendChild(this.createPinAvatars(thread))
 
         pin.addEventListener('click', (event) => {
           event.stopPropagation()
@@ -267,18 +267,79 @@ export class PreviewCommentsElement extends HTMLElement {
       })
   }
 
-  private getThreadInitials(thread: Thread): string {
-    const name = thread.comments[0]?.author.name?.trim()
-    if (!name) {
-      return '?'
+  private createPinAvatars(thread: Thread): HTMLElement {
+    const users = this.getThreadParticipants(thread)
+    const container = document.createElement('div')
+    container.className = 'pc-pin-stack'
+
+    const visibleUsers = users.slice(0, 3)
+    for (const user of visibleUsers) {
+      const avatar = document.createElement('span')
+      avatar.className = 'pc-pin-mini'
+      avatar.title = user.name
+      avatar.textContent = this.getInitials(user.name)
+      avatar.style.background = this.getAvatarColor(user.name)
+      container.appendChild(avatar)
     }
 
-    const parts = name.split(/\s+/).filter(Boolean)
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase()
+    const overflow = users.length - visibleUsers.length
+    if (overflow > 0) {
+      const extra = document.createElement('span')
+      extra.className = 'pc-pin-overflow'
+      extra.title = `${overflow} more`
+      extra.textContent = `+${overflow}`
+      container.appendChild(extra)
     }
 
+    if (users.length === 0) {
+      const fallback = document.createElement('span')
+      fallback.className = 'pc-pin-mini'
+      fallback.textContent = '?'
+      fallback.style.background = '#9ca3af'
+      container.appendChild(fallback)
+    }
+
+    return container
+  }
+
+  private getThreadParticipants(thread: Thread): Array<{ name: string }> {
+    const uniqueNames = new Set<string>()
+    const participants: Array<{ name: string }> = []
+
+    for (const comment of thread.comments) {
+      const name = comment.author.name.trim()
+      if (!name || uniqueNames.has(name)) {
+        continue
+      }
+      uniqueNames.add(name)
+      participants.push({ name })
+    }
+
+    return participants
+  }
+
+  private getInitials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean)
+    if (parts.length === 0) return '?'
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
     return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+  }
+
+  private getAvatarColor(seed: string): string {
+    const palette = [
+      'linear-gradient(135deg, #f59e0b, #f97316)',
+      'linear-gradient(135deg, #22d3ee, #06b6d4)',
+      'linear-gradient(135deg, #4f46e5, #6366f1)',
+      'linear-gradient(135deg, #ec4899, #f43f5e)',
+      'linear-gradient(135deg, #84cc16, #22c55e)',
+      'linear-gradient(135deg, #a855f7, #8b5cf6)',
+    ]
+
+    let hash = 0
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+    }
+    return palette[hash % palette.length]
   }
 
   private showThreadPopover(thread: Thread, x: number, y: number): void {

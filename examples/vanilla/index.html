@@ -24,6 +24,14 @@
     <p>Comments are stored as GitHub PR comments.</p>
   </div>
 
+  <script type="importmap">
+    {
+      "imports": {
+        "@preview-comments/core": "../../packages/core/dist/index.js"
+      }
+    }
+  </script>
+
   <script type="module">
     import { mount } from '../../packages/ui/dist/index.js'
     import { createGitHubAdapter } from '../../packages/github/dist/index.js'

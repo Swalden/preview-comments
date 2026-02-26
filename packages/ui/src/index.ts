@@ -1,4 +1,4 @@
-import type { Adapter } from '@preview-comments/core'
+import type { Adapter, User } from '@preview-comments/core'
 import { PreviewCommentsElement } from './component'
 
 if (typeof customElements !== 'undefined' && !customElements.get('preview-comments')) {
@@ -9,6 +9,7 @@ export interface MountOptions {
   adapter: Adapter
   githubClientId?: string
   githubCallbackUrl?: string
+  initialUser?: User
 }
 
 export function mount(options: MountOptions): PreviewCommentsElement {

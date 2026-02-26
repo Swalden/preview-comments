@@ -8,6 +8,7 @@ import {
   type PinAnchor,
   type Store,
   type Thread,
+  type User,
 } from '@preview-comments/core'
 import { baseStyles } from './styles'
 import { renderToolbar } from './toolbar'
@@ -16,6 +17,7 @@ export interface PreviewCommentsConfigureOptions {
   adapter: Adapter
   githubClientId?: string
   githubCallbackUrl?: string
+  initialUser?: User
 }
 
 export class PreviewCommentsElement extends HTMLElement {
@@ -48,6 +50,10 @@ export class PreviewCommentsElement extends HTMLElement {
 
   configure(options: PreviewCommentsConfigureOptions): void {
     this.adapter = options.adapter
+
+    if (options.initialUser) {
+      this.store.setState({ user: options.initialUser })
+    }
 
     if (options.githubClientId && options.githubCallbackUrl) {
       this.oauth = createOAuthManager({

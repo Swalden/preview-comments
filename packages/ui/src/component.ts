@@ -111,12 +111,19 @@ export class PreviewCommentsElement extends HTMLElement {
   }
 
   private async handleDocumentClick(event: MouseEvent): Promise<void> {
-    const { mode, user } = this.store.getState()
+    const { mode, user, activeThreadId } = this.store.getState()
+    const clickInsideWidget = event.composedPath().includes(this)
+
+    if (activeThreadId && !clickInsideWidget) {
+      this.store.setState({ activeThreadId: null })
+      this.popoverContainer.innerHTML = ''
+    }
+
     if (mode !== 'commenting') {
       return
     }
 
-    if (event.composedPath().includes(this)) {
+    if (clickInsideWidget) {
       return
     }
 

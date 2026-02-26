@@ -114,7 +114,11 @@ export const baseStyles = `
   }
 
   .pc-pin:hover { transform: translate(-50%, -50%) scale(1.08); }
-  .pc-pin.resolved { opacity: 0.78; filter: grayscale(0.2); }
+  .pc-pin.resolved {
+    opacity: 0.44;
+    filter: grayscale(0.95) saturate(0.35) brightness(0.92);
+    transform: translate(-50%, -50%) scale(0.9);
+  }
 
   .pc-pin-stack {
     display: inline-flex;

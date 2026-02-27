@@ -1,6 +1,6 @@
 {
   "name": "@preview-comments/github",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -19,7 +19,7 @@
     "prepack": "pnpm build"
   },
   "dependencies": {
-    "@preview-comments/core": "workspace:*"
+    "@preview-comments/core": "^0.1.0"
   },
   "publishConfig": {
     "access": "public"

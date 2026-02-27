@@ -1,41 +1,43 @@
 # Releasing To npm
 
+Publishing is local/manual only. There is no CI publish workflow.
+
 ## One-time setup
 
-1. Make sure npm has access to the `@preview-comments` scope.
-2. In GitHub (`Swalden/preview-comments`), add repository secret `NPM_TOKEN`.
-3. Create an npm automation token (classic or granular) with publish access for the scope.
-4. Keep package scope public (already configured via `publishConfig.access = "public"`).
+1. Ensure you can publish to the `@preview-comments` npm scope.
+2. Authenticate locally:
 
-## Versioning workflow
+```bash
+npm adduser
+```
 
-1. Add a changeset on your feature branch:
+## Versioning
+
+Create a changeset for package version bumps:
 
 ```bash
 pnpm changeset
 ```
 
-2. Commit the generated file in `.changeset/*.md`.
-3. Merge to `main`.
+Commit the generated file in `.changeset/*.md`.
 
-## What happens on main
+## Publish locally
 
-The `Release` GitHub Action will:
-
-1. Install dependencies
-2. Build all packages
-3. If there are unpublished changesets:
-   - open/update a release PR with bumped versions
-4. Once the release PR is merged:
-   - publish packages to npm using `NPM_TOKEN`
-
-## Manual release (optional)
-
-If you want to publish manually from your machine:
+Run:
 
 ```bash
-npm adduser
 pnpm release
 ```
 
 This runs build + `changeset publish`.
+
+## Verify packages
+
+Check published versions:
+
+```bash
+npm view @preview-comments/core version
+npm view @preview-comments/ui version
+npm view @preview-comments/local version
+npm view @preview-comments/github version
+```

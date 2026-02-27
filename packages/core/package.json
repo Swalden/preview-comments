@@ -15,7 +15,11 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT"
 }

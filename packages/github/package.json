@@ -15,10 +15,14 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@preview-comments/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT"
 }

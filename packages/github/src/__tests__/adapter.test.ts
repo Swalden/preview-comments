@@ -27,8 +27,7 @@ describe('createGitHubAdapter', () => {
 
   it('throws when token is missing', async () => {
     const adapter = createGitHubAdapter({
-      repo: 'owner/repo',
-      pr: 1,
+      issuesPath: 'owner/repo/issues/1',
       getToken: () => null,
     })
 
@@ -45,8 +44,7 @@ describe('createGitHubAdapter', () => {
     ))
 
     const adapter = createGitHubAdapter({
-      repo: 'owner/repo',
-      pr: 1,
+      issuesPath: 'owner/repo/issues/1',
       getToken: () => 'token',
     })
 
@@ -67,8 +65,7 @@ describe('createGitHubAdapter', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     const adapter = createGitHubAdapter({
-      repo: 'owner/repo',
-      pr: 123,
+      issuesPath: 'owner/repo/issues/123',
       getToken: () => 'token',
     })
 
@@ -91,8 +88,7 @@ describe('createGitHubAdapter', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     const adapter = createGitHubAdapter({
-      repo: 'owner/repo',
-      pr: 123,
+      issuesPath: 'owner/repo/issues/123',
       getToken: () => 'token',
     })
 

@@ -2,8 +2,8 @@ import type { Adapter, Comment, PinAnchor, Thread } from '@preview-comments/core
 import { parseThread, serializeThread } from './parser'
 
 export interface GitHubAdapterConfig {
-  repo: string
-  pr: number
+  /** Full GitHub issues path, e.g. "kimia-ai/kimia-front/issues/760" */
+  issuesPath: string
   getToken: () => string | null
 }
 
@@ -19,8 +19,12 @@ interface GitHubUser {
 }
 
 export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
-  const { repo, pr, getToken } = config
-  const baseUrl = `https://api.github.com/repos/${repo}`
+  const { issuesPath, getToken } = config
+  const baseUrl = `https://api.github.com/repos/${issuesPath.replace(/\/issues\/\d+$/, '')}`
+  const issueNumber = issuesPath.match(/\/issues\/(\d+)$/)?.[1]
+  if (!issueNumber) {
+    throw new Error('issuesPath must end with /issues/{number}')
+  }
 
   async function request(path: string, options: RequestInit = {}): Promise<any> {
     const token = getToken()
@@ -73,14 +77,14 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
 
   return {
     async getThreads() {
-      const comments = (await request(`/issues/${pr}/comments`)) as GitHubComment[]
+      const comments = (await request(`/issues/${issueNumber}/comments`)) as GitHubComment[]
       return comments.map(toThread).filter((thread): thread is Thread => thread !== null)
     },
 
     async createThread(anchor: PinAnchor, body: string) {
       const user = (await request('/user')) as GitHubUser
       const serialized = serializeThread(anchor, [{ body, author: user.login }])
-      const ghComment = (await request(`/issues/${pr}/comments`, {
+      const ghComment = (await request(`/issues/${issueNumber}/comments`, {
         method: 'POST',
         body: JSON.stringify({ body: serialized }),
       })) as GitHubComment

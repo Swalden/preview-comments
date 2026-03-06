@@ -1,5 +1,11 @@
 # @preview-comments/github
 
+## 0.2.1
+
+### Patch Changes
+
+- [`28ce5ca`](https://github.com/Swalden/preview-comments/commit/28ce5ca448d46065371fd9ba3be1016cacbc0bc5) Thanks [@Swalden](https://github.com/Swalden)! - Fix /user API endpoint to use absolute GitHub API URL instead of repo-relative path
+
 ## 0.2.0
 
 ### Minor Changes

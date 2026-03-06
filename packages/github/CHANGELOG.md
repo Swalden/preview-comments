@@ -1,5 +1,11 @@
 # @preview-comments/github
 
+## 0.2.0
+
+### Minor Changes
+
+- [`ff7f4fa`](https://github.com/Swalden/preview-comments/commit/ff7f4faf079a43f7a906e4f7f7e4261bdc94c9d7) Thanks [@Swalden](https://github.com/Swalden)! - Replace `repo` + `pr` config with `issuesPath` for a generic GitHub issues path
+
 ## 0.1.0
 
 ### Minor Changes

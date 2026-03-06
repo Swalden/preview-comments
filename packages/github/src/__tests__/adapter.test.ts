@@ -73,6 +73,11 @@ describe('createGitHubAdapter', () => {
     expect(thread.id).toBe('5')
     expect(thread.comments[0].author.name).toBe('alice')
     expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://api.github.com/user',
+      expect.objectContaining({}),
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
       2,
       'https://api.github.com/repos/owner/repo/issues/123/comments',
       expect.objectContaining({ method: 'POST' }),

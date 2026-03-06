@@ -32,7 +32,10 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
       throw new Error('Not authenticated')
     }
 
-    const response = await fetch(`${baseUrl}${path}`, {
+    const url = path.startsWith('/')
+      ? `https://api.github.com${path}`
+      : `${baseUrl}/${path}`
+    const response = await fetch(url, {
       ...options,
       headers: {
         Accept: 'application/vnd.github.v3+json',
@@ -77,14 +80,14 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
 
   return {
     async getThreads() {
-      const comments = (await request(`/issues/${issueNumber}/comments`)) as GitHubComment[]
+      const comments = (await request(`issues/${issueNumber}/comments`)) as GitHubComment[]
       return comments.map(toThread).filter((thread): thread is Thread => thread !== null)
     },
 
     async createThread(anchor: PinAnchor, body: string) {
       const user = (await request('/user')) as GitHubUser
       const serialized = serializeThread(anchor, [{ body, author: user.login }])
-      const ghComment = (await request(`/issues/${issueNumber}/comments`, {
+      const ghComment = (await request(`issues/${issueNumber}/comments`, {
         method: 'POST',
         body: JSON.stringify({ body: serialized }),
       })) as GitHubComment
@@ -97,26 +100,26 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
     },
 
     async resolveThread(threadId: string) {
-      const ghComment = (await request(`/issues/comments/${threadId}`)) as GitHubComment
+      const ghComment = (await request(`issues/comments/${threadId}`)) as GitHubComment
       const parsed = parseThread(ghComment.body)
       if (!parsed) {
         return
       }
 
       const updated = serializeThread(parsed.anchor, parsed.comments, true)
-      await request(`/issues/comments/${threadId}`, {
+      await request(`issues/comments/${threadId}`, {
         method: 'PATCH',
         body: JSON.stringify({ body: updated }),
       })
     },
 
     async deleteThread(threadId: string) {
-      await request(`/issues/comments/${threadId}`, { method: 'DELETE' })
+      await request(`issues/comments/${threadId}`, { method: 'DELETE' })
     },
 
     async addComment(threadId: string, body: string): Promise<Comment> {
       const user = (await request('/user')) as GitHubUser
-      const ghComment = (await request(`/issues/comments/${threadId}`)) as GitHubComment
+      const ghComment = (await request(`issues/comments/${threadId}`)) as GitHubComment
       const parsed = parseThread(ghComment.body)
       if (!parsed) {
         throw new Error('Thread not found')
@@ -124,7 +127,7 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
 
       parsed.comments.push({ body, author: user.login })
       const updated = serializeThread(parsed.anchor, parsed.comments, parsed.resolved)
-      await request(`/issues/comments/${threadId}`, {
+      await request(`issues/comments/${threadId}`, {
         method: 'PATCH',
         body: JSON.stringify({ body: updated }),
       })
@@ -143,7 +146,7 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
     async editComment(commentId: string, body: string): Promise<Comment> {
       const [threadId, indexString] = commentId.split('-')
       const index = Number.parseInt(indexString, 10)
-      const ghComment = (await request(`/issues/comments/${threadId}`)) as GitHubComment
+      const ghComment = (await request(`issues/comments/${threadId}`)) as GitHubComment
       const parsed = parseThread(ghComment.body)
 
       if (!parsed || !parsed.comments[index]) {
@@ -152,7 +155,7 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
 
       parsed.comments[index].body = body
       const updated = serializeThread(parsed.anchor, parsed.comments, parsed.resolved)
-      await request(`/issues/comments/${threadId}`, {
+      await request(`issues/comments/${threadId}`, {
         method: 'PATCH',
         body: JSON.stringify({ body: updated }),
       })
@@ -170,7 +173,7 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
     async deleteComment(commentId: string): Promise<void> {
       const [threadId, indexString] = commentId.split('-')
       const index = Number.parseInt(indexString, 10)
-      const ghComment = (await request(`/issues/comments/${threadId}`)) as GitHubComment
+      const ghComment = (await request(`issues/comments/${threadId}`)) as GitHubComment
       const parsed = parseThread(ghComment.body)
 
       if (!parsed) {
@@ -179,12 +182,12 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
 
       parsed.comments.splice(index, 1)
       if (parsed.comments.length === 0) {
-        await request(`/issues/comments/${threadId}`, { method: 'DELETE' })
+        await request(`issues/comments/${threadId}`, { method: 'DELETE' })
         return
       }
 
       const updated = serializeThread(parsed.anchor, parsed.comments, parsed.resolved)
-      await request(`/issues/comments/${threadId}`, {
+      await request(`issues/comments/${threadId}`, {
         method: 'PATCH',
         body: JSON.stringify({ body: updated }),
       })

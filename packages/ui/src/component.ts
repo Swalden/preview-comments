@@ -18,6 +18,7 @@ export interface PreviewCommentsConfigureOptions {
   githubClientId?: string
   githubCallbackUrl?: string
   initialUser?: User
+  onLogout?: () => void
 }
 
 export class PreviewCommentsElement extends HTMLElement {
@@ -28,6 +29,7 @@ export class PreviewCommentsElement extends HTMLElement {
   private pinsContainer!: HTMLElement
   private popoverContainer!: HTMLElement
   private cleanup: Array<() => void> = []
+  private onLogout?: () => void
 
   constructor() {
     super()
@@ -55,6 +57,8 @@ export class PreviewCommentsElement extends HTMLElement {
       this.store.setState({ user: options.initialUser })
     }
 
+    this.onLogout = options.onLogout
+
     if (options.githubClientId && options.githubCallbackUrl) {
       this.oauth = createOAuthManager({
         clientId: options.githubClientId,
@@ -81,7 +85,7 @@ export class PreviewCommentsElement extends HTMLElement {
     style.textContent = baseStyles
     this.shadowRootEl.appendChild(style)
 
-    const toolbar = renderToolbar(this.store)
+    const toolbar = renderToolbar(this.store, { onLogout: this.onLogout })
     this.shadowRootEl.appendChild(toolbar)
 
     this.pinsContainer = document.createElement('div')

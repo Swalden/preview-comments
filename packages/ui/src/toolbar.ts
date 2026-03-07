@@ -1,8 +1,13 @@
 import type { Store } from '@preview-comments/core'
 
 const COMMENT_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`
+const LOGOUT_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
 
-export function renderToolbar(store: Store): HTMLElement {
+export interface ToolbarOptions {
+  onLogout?: () => void
+}
+
+export function renderToolbar(store: Store, options: ToolbarOptions = {}): HTMLElement {
   const toolbar = document.createElement('div')
   toolbar.className = 'pc-toolbar'
 
@@ -60,6 +65,27 @@ export function renderToolbar(store: Store): HTMLElement {
   primarySegment.appendChild(people)
 
   toolbar.appendChild(primarySegment)
+
+  if (options.onLogout) {
+    const logoutBtn = document.createElement('button')
+    logoutBtn.className = 'pc-toolbar-btn pc-logout-btn'
+    logoutBtn.innerHTML = LOGOUT_ICON
+    logoutBtn.title = 'Sign out'
+    logoutBtn.addEventListener('click', () => options.onLogout?.())
+
+    const logoutSegment = document.createElement('div')
+    logoutSegment.className = 'pc-toolbar-segment'
+    logoutSegment.appendChild(logoutBtn)
+
+    // Only show when user is logged in
+    logoutSegment.style.display = 'none'
+    store.subscribe(() => {
+      const { user } = store.getState()
+      logoutSegment.style.display = user ? 'flex' : 'none'
+    })
+
+    toolbar.appendChild(logoutSegment)
+  }
 
   return toolbar
 }

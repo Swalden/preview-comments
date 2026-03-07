@@ -10,6 +10,7 @@ export interface MountOptions {
   githubClientId?: string
   githubCallbackUrl?: string
   initialUser?: User
+  onLogout?: () => void
 }
 
 export function mount(options: MountOptions): PreviewCommentsElement {

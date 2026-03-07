@@ -1,5 +1,11 @@
 # @preview-comments/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- [`fc7750c`](https://github.com/Swalden/preview-comments/commit/fc7750c76f8d2b0d26256270e9990c61da0916da) Thanks [@Swalden](https://github.com/Swalden)! - Add optional logout button to toolbar via `onLogout` callback
+
 ## 0.1.0
 
 ### Minor Changes

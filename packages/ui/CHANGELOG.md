@@ -1,5 +1,28 @@
 # @preview-comments/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- Security and UX fixes:
+
+  - core: OAuth popup now sends the app origin as the `state` param and only
+    accepts token messages whose `event.origin` matches the callback worker and
+    whose `event.source` is the popup window (requires a callback page that
+    posts to the validated `state` origin instead of `'*'`).
+  - github: `resolveThread` now toggles the resolved state (Reopen previously
+    re-resolved), and API errors carry a `status` property.
+  - ui: comment author, body, and pathname are rendered with `textContent`
+    instead of `innerHTML` (XSS fix); pins re-anchor on scroll/resize and the
+    open popover follows its pin; resolve/delete/reply surface errors inline
+    instead of failing silently; a 401 clears the stored token so the sign-in
+    flow reappears.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @preview-comments/core@0.2.0
+
 ## 0.2.0
 
 ### Minor Changes

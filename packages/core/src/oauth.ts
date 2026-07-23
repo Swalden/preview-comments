@@ -45,6 +45,8 @@ export function createOAuthManager(config: OAuthConfig): OAuthManager {
       client_id: clientId,
       redirect_uri: callbackUrl,
       scope: 'repo',
+      // The callback page posts the token back to this origin (never '*').
+      state: window.location.origin,
     })
     return `https://github.com/login/oauth/authorize?${params.toString()}`
   }
@@ -57,7 +59,13 @@ export function createOAuthManager(config: OAuthConfig): OAuthManager {
         return
       }
 
+      const callbackOrigin = new URL(callbackUrl).origin
+
       function onMessage(event: MessageEvent): void {
+        if (event.origin !== callbackOrigin || event.source !== popup) {
+          return
+        }
+
         if (event.data?.type === 'preview-comments:token') {
           window.removeEventListener('message', onMessage)
           const token = String(event.data.token ?? '')

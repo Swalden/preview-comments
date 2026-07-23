@@ -46,7 +46,9 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
     })
 
     if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status}`)
+      const error = new Error(`GitHub API error: ${response.status}`)
+      ;(error as Error & { status: number }).status = response.status
+      throw error
     }
 
     if (response.status === 204) {
@@ -106,7 +108,7 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
         return
       }
 
-      const updated = serializeThread(parsed.anchor, parsed.comments, true)
+      const updated = serializeThread(parsed.anchor, parsed.comments, !parsed.resolved)
       await request(`issues/comments/${threadId}`, {
         method: 'PATCH',
         body: JSON.stringify({ body: updated }),

@@ -1,5 +1,12 @@
 # @preview-comments/local
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @preview-comments/core@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes

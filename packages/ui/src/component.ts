@@ -108,6 +108,24 @@ export class PreviewCommentsElement extends HTMLElement {
     }
     document.addEventListener('keydown', onKeyDown)
     this.cleanup.push(() => document.removeEventListener('keydown', onKeyDown))
+
+    // Pins are position: fixed, so anchors resolved against elements drift on
+    // scroll/resize; re-render at most once per frame to keep them attached.
+    let rafId = 0
+    const onViewportChange = () => {
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = 0
+        this.renderPins()
+      })
+    }
+    window.addEventListener('scroll', onViewportChange, { capture: true, passive: true })
+    window.addEventListener('resize', onViewportChange)
+    this.cleanup.push(() => {
+      window.removeEventListener('scroll', onViewportChange, { capture: true })
+      window.removeEventListener('resize', onViewportChange)
+      if (rafId) cancelAnimationFrame(rafId)
+    })
   }
 
   private updateBodyCursor(): void {
@@ -274,6 +292,16 @@ export class PreviewCommentsElement extends HTMLElement {
           this.showThreadPopover(thread, position.x, position.y)
         })
 
+        // Move the open popover with its pin without rebuilding it, so a
+        // draft reply survives scrolling.
+        if (activeThreadId === thread.id) {
+          const popover = this.popoverContainer.querySelector('.pc-popover') as HTMLElement | null
+          if (popover) {
+            popover.style.left = `${position.x + 20}px`
+            popover.style.top = `${position.y}px`
+          }
+        }
+
         this.pinsContainer.appendChild(pin)
       })
   }
@@ -363,9 +391,19 @@ export class PreviewCommentsElement extends HTMLElement {
 
     const header = document.createElement('div')
     header.className = 'pc-popover-header'
-    header.innerHTML = `<span>${thread.anchor.pathname}</span>`
+    const pathLabel = document.createElement('span')
+    pathLabel.textContent = thread.anchor.pathname
+    header.appendChild(pathLabel)
 
     const actions = document.createElement('div')
+
+    const status = document.createElement('div')
+    status.className = 'pc-inline-status'
+    status.style.display = 'none'
+    const showError = (error: unknown, fallback: string) => {
+      status.textContent = error instanceof Error ? error.message : fallback
+      status.style.display = 'block'
+    }
 
     const resolve = document.createElement('button')
     resolve.className = 'pc-btn-ghost'
@@ -374,8 +412,18 @@ export class PreviewCommentsElement extends HTMLElement {
       if (!this.adapter) {
         return
       }
-      await this.adapter.resolveThread(thread.id)
-      await this.loadThreads()
+      try {
+        await this.adapter.resolveThread(thread.id)
+        await this.loadThreads()
+        const updated = this.store
+          .getState()
+          .threads.find((candidate) => candidate.id === thread.id)
+        if (updated) {
+          this.showThreadPopover(updated, x, y)
+        }
+      } catch (error) {
+        showError(error, 'Failed to update thread.')
+      }
     })
 
     const remove = document.createElement('button')
@@ -385,7 +433,12 @@ export class PreviewCommentsElement extends HTMLElement {
       if (!this.adapter) {
         return
       }
-      await this.adapter.deleteThread(thread.id)
+      try {
+        await this.adapter.deleteThread(thread.id)
+      } catch (error) {
+        showError(error, 'Failed to delete thread.')
+        return
+      }
       this.store.setState({
         threads: this.store.getState().threads.filter((candidate) => candidate.id !== thread.id),
         activeThreadId: null,
@@ -401,11 +454,20 @@ export class PreviewCommentsElement extends HTMLElement {
     for (const comment of thread.comments) {
       const commentElement = document.createElement('div')
       commentElement.className = 'pc-comment'
-      commentElement.innerHTML = `
-        <div class="pc-comment-author">${comment.author.name}</div>
-        <div class="pc-comment-body">${comment.body}</div>
-        <div class="pc-comment-time">${new Date(comment.createdAt).toLocaleString()}</div>
-      `
+
+      const author = document.createElement('div')
+      author.className = 'pc-comment-author'
+      author.textContent = comment.author.name
+
+      const body = document.createElement('div')
+      body.className = 'pc-comment-body'
+      body.textContent = comment.body
+
+      const time = document.createElement('div')
+      time.className = 'pc-comment-time'
+      time.textContent = new Date(comment.createdAt).toLocaleString()
+
+      commentElement.append(author, body, time)
       popover.appendChild(commentElement)
     }
 
@@ -425,8 +487,17 @@ export class PreviewCommentsElement extends HTMLElement {
       if (!body || !this.adapter) {
         return
       }
-      await this.adapter.addComment(thread.id, body)
-      await this.loadThreads()
+      reply.disabled = true
+      reply.textContent = '...'
+      try {
+        await this.adapter.addComment(thread.id, body)
+        await this.loadThreads()
+      } catch (error) {
+        reply.disabled = false
+        reply.textContent = 'Reply'
+        showError(error, 'Failed to post reply.')
+        return
+      }
 
       const updated = this.store.getState().threads.find((candidate) => candidate.id === thread.id)
       if (updated) {
@@ -437,6 +508,7 @@ export class PreviewCommentsElement extends HTMLElement {
     inputArea.appendChild(input)
     inputArea.appendChild(reply)
     popover.appendChild(inputArea)
+    popover.appendChild(status)
     this.popoverContainer.appendChild(popover)
   }
 
@@ -447,8 +519,13 @@ export class PreviewCommentsElement extends HTMLElement {
     try {
       const threads = await this.adapter.getThreads()
       this.store.setState({ threads })
-    } catch {
-      // Most likely unauthenticated; leave UI usable for auth flow.
+    } catch (error) {
+      // An expired/revoked token otherwise leaves the widget silently empty;
+      // clear it so the sign-in flow reappears.
+      if ((error as { status?: number }).status === 401) {
+        this.oauth?.clearToken()
+        this.store.setState({ user: null })
+      }
     }
   }
 }

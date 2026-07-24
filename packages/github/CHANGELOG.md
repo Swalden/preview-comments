@@ -1,5 +1,14 @@
 # @preview-comments/github
 
+## 0.3.1
+
+### Patch Changes
+
+- Bypass the browser HTTP cache on GitHub API requests (`cache: 'no-store'`).
+  GitHub responses carry `Cache-Control: max-age=60`, so reads right after a
+  write returned stale data and resolve/reply changes didn't appear in the UI
+  for up to a minute.
+
 ## 0.3.0
 
 ### Minor Changes

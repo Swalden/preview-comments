@@ -35,8 +35,12 @@ export function createGitHubAdapter(config: GitHubAdapterConfig): Adapter {
     const url = path.startsWith('/')
       ? `https://api.github.com${path}`
       : `${baseUrl}/${path}`
+    // GitHub API responses carry Cache-Control: max-age=60; without no-store
+    // the browser serves stale reads right after a write and the UI never
+    // reflects resolves/replies until the cache expires.
     const response = await fetch(url, {
       ...options,
+      cache: 'no-store',
       headers: {
         Accept: 'application/vnd.github.v3+json',
         Authorization: `Bearer ${token}`,

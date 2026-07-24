@@ -1,5 +1,14 @@
 # @preview-comments/ui
 
+## 0.3.1
+
+### Patch Changes
+
+- Update thread state locally after resolve/reply instead of refetching.
+  GitHub's list API serves stale comment bodies for a few seconds after a
+  write, so the post-write refetch showed the old state and toggles appeared
+  to do nothing.
+
 ## 0.3.0
 
 ### Minor Changes

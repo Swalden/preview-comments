@@ -414,13 +414,15 @@ export class PreviewCommentsElement extends HTMLElement {
       }
       try {
         await this.adapter.resolveThread(thread.id)
-        await this.loadThreads()
-        const updated = this.store
-          .getState()
-          .threads.find((candidate) => candidate.id === thread.id)
-        if (updated) {
-          this.showThreadPopover(updated, x, y)
-        }
+        // Update locally: GitHub's list API serves stale bodies for a few
+        // seconds after a write, so refetching here would show the old state.
+        const updated = { ...thread, resolved: !thread.resolved }
+        this.store.setState({
+          threads: this.store
+            .getState()
+            .threads.map((candidate) => (candidate.id === thread.id ? updated : candidate)),
+        })
+        this.showThreadPopover(updated, x, y)
       } catch (error) {
         showError(error, 'Failed to update thread.')
       }
@@ -489,9 +491,9 @@ export class PreviewCommentsElement extends HTMLElement {
       }
       reply.disabled = true
       reply.textContent = '...'
+      let comment
       try {
-        await this.adapter.addComment(thread.id, body)
-        await this.loadThreads()
+        comment = await this.adapter.addComment(thread.id, body)
       } catch (error) {
         reply.disabled = false
         reply.textContent = 'Reply'
@@ -499,10 +501,13 @@ export class PreviewCommentsElement extends HTMLElement {
         return
       }
 
-      const updated = this.store.getState().threads.find((candidate) => candidate.id === thread.id)
-      if (updated) {
-        this.showThreadPopover(updated, x, y)
-      }
+      const updated = { ...thread, comments: [...thread.comments, comment] }
+      this.store.setState({
+        threads: this.store
+          .getState()
+          .threads.map((candidate) => (candidate.id === thread.id ? updated : candidate)),
+      })
+      this.showThreadPopover(updated, x, y)
     })
 
     inputArea.appendChild(input)

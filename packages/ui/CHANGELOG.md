@@ -1,5 +1,14 @@
 # @preview-comments/ui
 
+## 0.3.2
+
+### Patch Changes
+
+- Comment composer: move the Post/Reply button onto its own row below the
+  textarea. Side by side in a flex row, the button could be pushed past the
+  popover's edge and clipped away by `overflow: hidden`, leaving no visible
+  way to submit.
+
 ## 0.3.1
 
 ### Patch Changes

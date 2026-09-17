@@ -188,11 +188,16 @@ export const baseStyles = `
 
   .pc-comment-time { font-size: 11px; color: var(--pc-text-muted); margin-top: 4px; }
 
+  /* The textarea takes a full row and the button wraps beneath it: a single
+     row lets the button overflow the popover, which clips it (overflow:hidden). */
   .pc-input-area {
     padding: 10px 12px;
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
   }
+
+  .pc-input-area .pc-btn { margin-left: auto; }
 
   .pc-inline-status {
     padding: 0 12px 10px;
@@ -201,7 +206,8 @@ export const baseStyles = `
   }
 
   .pc-input {
-    flex: 1;
+    flex: 1 1 100%;
+    min-width: 0;
     border: 1px solid var(--pc-border);
     background: var(--pc-bg-soft);
     color: var(--pc-text);
